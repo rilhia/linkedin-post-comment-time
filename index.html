@@ -1,85 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LinkedIn Time Decoder</title>
     <style>
-        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f2ef; display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
-        .card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 750px; }
-        h2 { color: #0073b1; margin-top: 0; }
-        p { color: #555; font-size: 0.95rem; margin-bottom: 5px;}
-        .control-group { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-        label { font-size: 0.85rem; font-weight: bold; color: #333; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #cdcfd2; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        input:focus, select:focus { border-color: #0073b1; outline: none; }
-        .result-container { margin-top: 25px; }
-        .time-section { background-color: #fff; border: 1px solid #e0e0e0; border-left: 6px solid #0073b1; border-radius: 6px; padding: 18px; margin-bottom: 20px; position: relative; }
-        .section-comment { border-left-color: #057642; background-color: #f6fff9; }
-        .section-reply { border-left-color: #cc1011; background-color: #fff6f6; }
-        .label { font-weight: bold; color: #333; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; }
-        .date-display { font-size: 1.2rem; color: #000; margin: 8px 0; font-weight: 600; }
-        .meta { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: #444; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
-        .id-badge { float: right; font-size: 0.75rem; background: #eee; padding: 3px 8px; border-radius: 4px; color: #555; font-family: monospace; }
-        .gap-indicator { text-align: center; margin: -10px 0 15px 0; font-size: 0.9rem; font-weight: bold; color: #0073b1; border: 1px dashed #0073b1; border-radius: 20px; padding: 4px; background: #f0f7fb; }
+        
+        body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f2ef;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 750px;
+        }
+
+        h2 {
+            color: #0073b1;
+            margin-top: 0;
+        }
+
+        p {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .control-group {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cdcfd2;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #0073b1;
+            outline: none;
+        }
+
+        .result-container {
+            margin-top: 25px;
+        }
+
+        .time-section {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-left: 6px solid #0073b1;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* Color differentiation for Comments (Green) and Replies (Red) */
+        .section-comment {
+            border-left-color: #057642;
+            background-color: #f6fff9;
+        }
+
+        .section-reply {
+            border-left-color: #cc1011;
+            background-color: #fff6f6;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: #000;
+            margin: 8px 0;
+            font-weight: 600;
+        }
+
+        .meta {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #444;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .id-badge {
+            float: right;
+            font-size: 0.75rem;
+            background: #eee;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #555;
+            font-family: monospace;
+        }
+
+        .gap-indicator {
+            text-align: center;
+            margin: -10px 0 15px 0;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #0073b1;
+            border: 1px dashed #0073b1;
+            border-radius: 20px;
+            padding: 4px;
+            background: #f0f7fb;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="card">
-    <h2>LinkedIn ID Decoder</h2>
-    <p>Paste the LinkedIn link below to audit the post timeline.</p>
-    
-    <div class="control-group">
-        <input type="text" id="urlInput" placeholder="Paste URL here..." oninput="processURL()">
+    <div class="card">
+        <h2>LinkedIn ID Decoder</h2>
+        <p>Paste the LinkedIn link below to audit the post timeline.</p>
+
+        <div class="control-group">
+            <input type="text" id="urlInput" placeholder="Paste URL here..." oninput="processURL()">
+        </div>
+
+        <div class="control-group">
+            <label for="timezoneSelect">Show Regional Time As:</label>
+            <select id="timezoneSelect" onchange="processURL()"></select>
+        </div>
+
+        <div id="results" class="result-container"></div>
     </div>
 
-    <div class="control-group">
-        <label for="timezoneSelect">Show Regional Time As:</label>
-        <select id="timezoneSelect" onchange="processURL()"></select>
-    </div>
+    <script>
+        // --- SETUP ---
+        // Automatically populate the dropdown with all system-supported timezones
+        const tzSelect = document.getElementById('timezoneSelect');
+        const timezones = Intl.supportedValuesOf('timeZone');
+        const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    <div id="results" class="result-container"></div>
-</div>
+        timezones.forEach(tz => {
+            const opt = document.createElement('option');
+            opt.value = tz;
+            opt.textContent = tz.replace(/_/g, ' '); // Make names readable (e.g. New_York -> New York)
+            if (tz === localTz) opt.selected = true; // Default to user's current timezone
+            tzSelect.appendChild(opt);
+        });
 
-<script>
-    const tzSelect = document.getElementById('timezoneSelect');
-    const timezones = Intl.supportedValuesOf('timeZone');
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        // --- CORE LOGIC: DECODING THE SNOWFLAKE ID ---
+        function decodeSnowflake(idStr) {
+            try {
+                // 1. Convert the string ID into a BigInt to prevent precision loss (LinkedIn IDs are 64-bit)
+                const id = BigInt(idStr);
 
-    timezones.forEach(tz => {
-        const opt = document.createElement('option');
-        opt.value = tz;
-        opt.textContent = tz.replace(/_/g, ' ');
-        if (tz === localTz) opt.selected = true;
-        tzSelect.appendChild(opt);
-    });
+                // 2. Perform a Bitwise Right Shift by 22.
+                // LinkedIn Snowflake IDs use the first 42 bits for the timestamp.
+                // Shifting by 22 essentially "chops off" the internal sequence/machine bits.
+                const ms = Number(id >> 22n);
 
-    function decodeSnowflake(idStr) {
-        try {
-            const id = BigInt(idStr);
-            const ms = Number(id >> 22n);
-            const date = new Date(ms);
-            const selectedTz = document.getElementById('timezoneSelect').value;
+                // 3. Convert the resulting milliseconds into a JavaScript Date object
+                const date = new Date(ms);
+                const selectedTz = document.getElementById('timezoneSelect').value;
 
-            const formatOptions = { 
-                dateStyle: 'full', 
-                timeStyle: 'medium' 
-            };
+                const formatOptions = {
+                    dateStyle: 'full',
+                    timeStyle: 'medium'
+                };
 
-            return {
-                regional: date.toLocaleString('en-GB', { ...formatOptions, timeZone: selectedTz }),
-                utcFormatted: date.toLocaleString('en-GB', { ...formatOptions, timeZone: 'UTC' }),
-                epoch: ms,
-                id: idStr,
-                tzName: selectedTz
-            };
-        } catch (e) { return null; }
-    }
+                return {
+                    regional: date.toLocaleString('en-GB', { ...formatOptions, timeZone: selectedTz }),
+                    utcFormatted: date.toLocaleString('en-GB', { ...formatOptions, timeZone: 'UTC' }),
+                    epoch: ms,
+                    id: idStr,
+                    tzName: selectedTz
+                };
+            } catch (e) { return null; }
+        }
 
-    function createUI(title, data, cssClass) {
-        if (!data) return '';
-        return `
+        // Helper function to build the HTML cards for the UI
+        function createUI(title, data, cssClass) {
+            if (!data) return '';
+            return `
             <div class="time-section ${cssClass}">
                 <span class="id-badge">ID: ${data.id}</span>
                 <span class="label">${title}</span>
@@ -91,50 +218,64 @@
                 </div>
             </div>
         `;
-    }
-
-    function processURL() {
-        const rawUrl = document.getElementById('urlInput').value.trim();
-        const resultsDiv = document.getElementById('results');
-        const decodedUrl = decodeURIComponent(rawUrl);
-        
-        if (!rawUrl) { resultsDiv.innerHTML = ''; return; }
-
-        let html = '';
-        let postMs = null;
-        let commentMs = null;
-
-        const postMatch = decodedUrl.match(/(?:ugcPost|activity|document):(\d{19})/) || decodedUrl.match(/-(\d{19})/);
-        if (postMatch) {
-            const data = decodeSnowflake(postMatch[1]);
-            postMs = data.epoch;
-            html += createUI('Original Post', data, '');
         }
 
-        const commentUrnMatch = decodedUrl.match(/commentUrn=[^)]+?,(\d{19})\)/);
-        if (commentUrnMatch) {
-            const data = decodeSnowflake(commentUrnMatch[1]);
-            commentMs = data.epoch;
-            if (postMs) {
-                const diff = ((commentMs - postMs) / 1000).toFixed(2);
-                html += `<div class="gap-indicator">⏱️ Comment posted ${diff}s after original post</div>`;
+        // --- URL PARSING ---
+        function processURL() {
+            const rawUrl = document.getElementById('urlInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+
+            // LinkedIn URLs often encode special characters like colons and commas
+            const decodedUrl = decodeURIComponent(rawUrl);
+
+            if (!rawUrl) { resultsDiv.innerHTML = ''; return; }
+
+            let html = '';
+            let postMs = null;
+            let commentMs = null;
+
+            // 1. Extract Post ID
+            // Looks for patterns like 'ugcPost:123', 'activity:123', or the ID at the end of a /posts/ slug
+            const postMatch = decodedUrl.match(/(?:ugcPost|activity|document):(\d{19})/) || decodedUrl.match(/-(\d{19})/);
+            if (postMatch) {
+                const data = decodeSnowflake(postMatch[1]);
+                postMs = data.epoch;
+                html += createUI('Original Post', data, '');
             }
-            html += createUI('Comment', data, 'section-comment');
-        }
 
-        const replyUrnMatch = decodedUrl.match(/replyUrn=[^)]+?,(\d{19})\)/);
-        if (replyUrnMatch) {
-            const data = decodeSnowflake(replyUrnMatch[1]);
-            if (commentMs) {
-                const diff = ((data.epoch - commentMs) / 1000).toFixed(2);
-                html += `<div class="gap-indicator">⏱️ Reply posted ${diff}s after comment</div>`;
+            // 2. Extract Comment ID
+            // Comment IDs are usually the second number in a URN pair: commentUrn=(postID,commentID)
+            const commentUrnMatch = decodedUrl.match(/commentUrn=[^)]+?,(\d{19})\)/);
+            if (commentUrnMatch) {
+                const data = decodeSnowflake(commentUrnMatch[1]);
+                commentMs = data.epoch;
+
+                // If we have both, calculate the time gap (useful for verifying human response times)
+                if (postMs) {
+                    const diff = ((commentMs - postMs) / 1000).toFixed(2);
+                    html += `<div class="gap-indicator">⏱️ Comment posted ${diff}s after original post</div>`;
+                }
+                html += createUI('Comment', data, 'section-comment');
             }
-            html += createUI('Reply to Comment', data, 'section-reply');
-        }
 
-        resultsDiv.innerHTML = html || '<p style="text-align:center; color:#999;">No LinkedIn IDs detected.</p>';
-    }
-</script>
+            // 3. Extract Reply ID
+            // Similarly, Reply IDs follow the replyUrn=(postID,replyID) pattern
+            const replyUrnMatch = decodedUrl.match(/replyUrn=[^)]+?,(\d{19})\)/);
+            if (replyUrnMatch) {
+                const data = decodeSnowflake(replyUrnMatch[1]);
+
+                // Calculate the gap between the parent comment and the reply
+                if (commentMs) {
+                    const diff = ((data.epoch - commentMs) / 1000).toFixed(2);
+                    html += `<div class="gap-indicator">⏱️ Reply posted ${diff}s after comment</div>`;
+                }
+                html += createUI('Reply to Comment', data, 'section-reply');
+            }
+
+            resultsDiv.innerHTML = html || '<p style="text-align:center; color:#999;">No LinkedIn IDs detected.</p>';
+        }
+    </script>
 
 </body>
+
 </html>
