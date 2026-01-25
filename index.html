@@ -3,51 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkedIn Time Decoder</title>
+    <title>LinkedIn Time Decoder (Forensic Version)</title>
     <style>
         body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f2ef; display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
         .card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 750px; }
         h2 { color: #0073b1; margin-top: 0; }
         p { color: #555; font-size: 0.95rem; margin-bottom: 5px;}
-        
         .control-group { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
         label { font-size: 0.85rem; font-weight: bold; color: #333; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #cdcfd2; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 1rem; 
-        }
+        input, select { width: 100%; padding: 12px; border: 2px solid #cdcfd2; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         input:focus, select:focus { border-color: #0073b1; outline: none; }
-        
         .result-container { margin-top: 25px; }
         .time-section { background-color: #fff; border: 1px solid #e0e0e0; border-left: 6px solid #0073b1; border-radius: 6px; padding: 18px; margin-bottom: 20px; position: relative; }
         .section-comment { border-left-color: #057642; background-color: #f6fff9; }
         .section-reply { border-left-color: #cc1011; background-color: #fff6f6; }
-        
         .label { font-weight: bold; color: #333; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; }
         .date-display { font-size: 1.2rem; color: #000; margin: 8px 0; font-weight: 600; }
-        .meta { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: #444; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 4px; }
+        .meta { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: #444; line-height: 1.6; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
         .id-badge { float: right; font-size: 0.75rem; background: #eee; padding: 3px 8px; border-radius: 4px; color: #555; font-family: monospace; }
-        
-        .gap-indicator { text-align: center; margin: -10px 0 15px 0; font-size: 0.9rem; font-weight: bold; color: #0073b1; }
+        .gap-indicator { text-align: center; margin: -10px 0 15px 0; font-size: 0.9rem; font-weight: bold; color: #0073b1; border: 1px dashed #0073b1; border-radius: 20px; padding: 4px; background: #f0f7fb; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>LinkedIn Thread Forensic Decoder</h2>
+    <h2>LinkedIn ID Decoder</h2>
     <p>Paste the LinkedIn link below to audit the post timeline.</p>
     
     <div class="control-group">
-        <input type="text" id="urlInput" placeholder="Paste URL (e.g. feed/update/urn...)" oninput="processURL()">
+        <input type="text" id="urlInput" placeholder="Paste URL here..." oninput="processURL()">
     </div>
 
     <div class="control-group">
-        <label for="timezoneSelect">Target Timezone:</label>
+        <label for="timezoneSelect">Show Regional Time As:</label>
         <select id="timezoneSelect" onchange="processURL()"></select>
     </div>
 
@@ -55,7 +43,6 @@
 </div>
 
 <script>
-    // Populate Timezone Dropdown
     const tzSelect = document.getElementById('timezoneSelect');
     const timezones = Intl.supportedValuesOf('timeZone');
     const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -75,13 +62,14 @@
             const date = new Date(ms);
             const selectedTz = document.getElementById('timezoneSelect').value;
 
+            const formatOptions = { 
+                dateStyle: 'full', 
+                timeStyle: 'medium' 
+            };
+
             return {
-                formatted: date.toLocaleString('en-GB', { 
-                    timeZone: selectedTz,
-                    dateStyle: 'full', 
-                    timeStyle: 'medium' 
-                }),
-                utc: date.toUTCString(),
+                regional: date.toLocaleString('en-GB', { ...formatOptions, timeZone: selectedTz }),
+                utcFormatted: date.toLocaleString('en-GB', { ...formatOptions, timeZone: 'UTC' }),
                 epoch: ms,
                 id: idStr,
                 tzName: selectedTz
@@ -95,10 +83,10 @@
             <div class="time-section ${cssClass}">
                 <span class="id-badge">ID: ${data.id}</span>
                 <span class="label">${title}</span>
-                <div class="date-display">${data.formatted}</div>
+                <div class="date-display">${data.regional}</div>
                 <div class="meta">
                     <strong>Zone:</strong> ${data.tzName}<br>
-                    <strong>UTC:</strong> ${data.utc}<br>
+                    <strong>UTC:</strong> ${data.utcFormatted} (Coordinated Universal Time)<br>
                     <strong>Epoch MS:</strong> ${data.epoch}
                 </div>
             </div>
@@ -116,7 +104,6 @@
         let postMs = null;
         let commentMs = null;
 
-        // 1. Post ID
         const postMatch = decodedUrl.match(/(?:ugcPost|activity|document):(\d{19})/) || decodedUrl.match(/-(\d{19})/);
         if (postMatch) {
             const data = decodeSnowflake(postMatch[1]);
@@ -124,30 +111,24 @@
             html += createUI('Original Post', data, '');
         }
 
-        // 2. Comment ID
         const commentUrnMatch = decodedUrl.match(/commentUrn=[^)]+?,(\d{19})\)/);
         if (commentUrnMatch) {
             const data = decodeSnowflake(commentUrnMatch[1]);
             commentMs = data.epoch;
-            
             if (postMs) {
                 const diff = ((commentMs - postMs) / 1000).toFixed(2);
                 html += `<div class="gap-indicator">⏱️ Comment posted ${diff}s after original post</div>`;
             }
-            
             html += createUI('Comment', data, 'section-comment');
         }
 
-        // 3. Reply ID
         const replyUrnMatch = decodedUrl.match(/replyUrn=[^)]+?,(\d{19})\)/);
         if (replyUrnMatch) {
             const data = decodeSnowflake(replyUrnMatch[1]);
-            
             if (commentMs) {
                 const diff = ((data.epoch - commentMs) / 1000).toFixed(2);
                 html += `<div class="gap-indicator">⏱️ Reply posted ${diff}s after comment</div>`;
             }
-
             html += createUI('Reply to Comment', data, 'section-reply');
         }
 
