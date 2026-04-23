@@ -245,7 +245,8 @@
 
             // 2. Extract Comment ID
             // Comment IDs are usually the second number in a URN pair: commentUrn=(postID,commentID)
-            const commentUrnMatch = decodedUrl.match(/commentUrn=[^)]+?,(\d{19})\)/);
+            //const commentUrnMatch = decodedUrl.match(/commentUrn=[^)]+?,(\d{19})\)/); - old
+            const commentUrnMatch = decodedUrl.match(/(?:dash)?[Cc]ommentUrn[^(]+\((\d{19})/);
             if (commentUrnMatch) {
                 const data = decodeSnowflake(commentUrnMatch[1]);
                 commentMs = data.epoch;
@@ -260,7 +261,8 @@
 
             // 3. Extract Reply ID
             // Similarly, Reply IDs follow the replyUrn=(postID,replyID) pattern
-            const replyUrnMatch = decodedUrl.match(/replyUrn=[^)]+?,(\d{19})\)/);
+            //const replyUrnMatch = decodedUrl.match(/replyUrn=[^)]+?,(\d{19})\)/); - old
+            const replyUrnMatch = decodedUrl.match(/(?:dash)?[Rr]eplyUrn[^(]+\((\d{19})/);
             if (replyUrnMatch) {
                 const data = decodeSnowflake(replyUrnMatch[1]);
 
