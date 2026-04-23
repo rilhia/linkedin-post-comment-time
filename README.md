@@ -1,3 +1,4 @@
+![Main Header Logo](images/LinkedInIdDecoder.jpeg)
 # LinkedIn ID Decoder
 
 A single-file browser tool that extracts exact timestamps from LinkedIn post, comment, and reply URLs.
